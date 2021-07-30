@@ -39,7 +39,7 @@ So you won't have to deal that much with HTML/CSS ( Ahhh... this is perfect ; )
 - collection : display all products
 - kids : display only kids products
 - women : display only women products
-- men : display only women products
+- men : display only men products
 
 (see bonus below)
 

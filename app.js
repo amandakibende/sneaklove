@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv/config");
 require("./config/mongodb"); // database initial setup
 require("./helpers/hbs"); // utils for hbs templates
 
@@ -8,20 +8,25 @@ const app = express();
 const createError = require("http-errors");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
-const hbo = require("hbs");
+const hbs = require("hbs");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const dev_mode = false;
 const logger = require("morgan");
+const indexRouter = require("./routes/index");
+const authRouter = require("./routes/auth");
+const dashRouter = require("./routes/dashboard_sneaker");
+
+
 
 // config logger (pour debug)
 app.use(logger("dev"));
 
 // initial config
 app.set("view engine", "hbs");
-app.set("views", __dirname + "/view");
+app.set("views", __dirname + "/views");
 app.use(express.static("public"));
-hbs.registerPartials(__dirname + "/views/partials");
+hbs.registerPartials(__dirname + "/views/partial");
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
@@ -31,11 +36,35 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     cookie: { maxAge: 60000 }, // in millisec
-    store: MongoStore.create({ mongoUrl: process.env.MOGO_URL }),
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     saveUninitialized: true,
     resave: true,
   })
 );
+
+app.use((req, res, next) => {
+  if (req.session.currentUser) {
+    User.findById(req.session.currentUser._id)
+      .then((userFromDb) => {
+        res.locals.currentUser = userFromDb;
+        res.locals.isLoggedIn = true;
+        next();
+        
+      })
+      .catch((error) => {
+        next(error);
+      });
+  } else {
+    res.locals.currentUser = undefined;
+    res.locals.isLoggedIn = false;
+    next();
+  }
+});
+
+app.use((req, res, next) => {
+  console.log(req.session);
+  next();
+});
 
 // below, site_url is used in partials/shop_head.hbs to perform ajax request (var instead of hardcoded)
 app.locals.site_url = process.env.SITE_URL;
@@ -54,6 +83,9 @@ app.use(require("./middlewares/exposeFlashMessage")); // expose flash messages t
 
 // routers
 app.use("/", require("./routes/index"));
+app.use("/signup", authRouter);
+app.use("/sneaker", dashRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

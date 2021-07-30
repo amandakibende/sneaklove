@@ -1,3 +1,4 @@
+{{#each sneakers}}
 <a href="/one-product/{{this._id}}" class="product-item-wrapper">
     <div class="product-img">
         <img src="{{this.image}}" alt="{{this.name}} : what a nice pair of kicks">
@@ -5,4 +6,7 @@
     <p class="product-name">{{this.name}}</p>
     <p class="product-cat">{{this.category}}</p>
     <p class="product-price">{{this.price}}</p>
+    
 </a>
+
+{{/each}}

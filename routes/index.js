@@ -1,32 +1,27 @@
 const express = require("express");
 const router = express.Router();
+const Sneaker = require("../models/Sneaker");
 
-return console.log(`\n\n
------------------------------
------------------------------
-     wax on / wax off !
------------------------------
------------------------------\n\n`
-);
+
 
 router.get("/", (req, res) => {
-  res.send("foo");
+  res.render("index.hbs");
 });
 
 router.get("/sneakers/:cat", (req, res) => {
-  res.send("bar");
+  res.render("products.hbs");
 });
 
 router.get("/one-product/:id", (req, res) => {
-  res.send("baz");
+  res.render("one_product.hbs");
 });
 
 router.get("/signup", (req, res) => {
-  res.send("sneak");
+  res.render("signup.hbs");
 });
 
 router.get("/signin", (req, res) => {
-  res.send("love");
+  res.render("signin.hbs");
 });
 
 
